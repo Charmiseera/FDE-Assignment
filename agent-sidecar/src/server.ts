@@ -231,17 +231,27 @@ app.post("/run", async (req: Request<{}, {}, RunRequest>, res: Response) => {
   } = req.body;
 
   try {
-    // ── HTML Artifact (Pi Agent Session) ──────────────────────────────────
+    // ── HTML Artifact (Pi Agent Session with Direct LLM Fallback) ─────────
     if (request_type === "html_artifact") {
       const htmlPrompt = buildHtmlArtifactPrompt(context_chunks, conversation);
-      const agentResult = await runAgentSession({
-        tools: [renderCheckTool],
-        prompt: htmlPrompt,
-        provider,
-        model,
-      });
+      let rawHtml = "";
+      try {
+        const agentResult = await runAgentSession({
+          tools: [renderCheckTool],
+          prompt: htmlPrompt,
+          provider,
+          model,
+        });
+        rawHtml = agentResult.content;
+      } catch (agentErr) {
+        console.warn("[Sidecar] Agent session execution error for HTML, falling back to direct LLM:", agentErr);
+      }
 
-      let rawHtml = agentResult.content;
+      if (!rawHtml || rawHtml.trim().length < 50) {
+        console.log(`[Sidecar] Agent session HTML empty/short. Generating HTML directly with ${provider}/${model}...`);
+        rawHtml = await generateText(htmlPrompt, provider, model);
+      }
+
       // Clean markdown code blocks if emitted by model
       rawHtml = rawHtml.replace(/^```html\s*/i, "").replace(/^```\s*/i, "").replace(/```$/, "").trim();
 
@@ -263,17 +273,27 @@ app.post("/run", async (req: Request<{}, {}, RunRequest>, res: Response) => {
       });
     }
 
-    // ── Ship 30/30 essay (Pi Agent Session) ───────────────────────────────
+    // ── Ship 30/30 essay (Pi Agent Session with Direct LLM Fallback) ──────
     if (request_type === "ship30_essay") {
       const essayPrompt = buildEssayPrompt(context_chunks, conversation);
-      const agentResult = await runAgentSession({
-        tools: [validateEssayTool],
-        prompt: essayPrompt,
-        provider,
-        model,
-      });
+      let essayContent = "";
+      try {
+        const agentResult = await runAgentSession({
+          tools: [validateEssayTool],
+          prompt: essayPrompt,
+          provider,
+          model,
+        });
+        essayContent = agentResult.content;
+      } catch (agentErr) {
+        console.warn("[Sidecar] Agent session execution error for essay, falling back to direct LLM:", agentErr);
+      }
 
-      const essayContent = agentResult.content;
+      if (!essayContent || essayContent.trim().length < 50) {
+        console.log(`[Sidecar] Agent session content empty/short. Generating essay directly with ${provider}/${model}...`);
+        essayContent = await generateText(essayPrompt, provider, model);
+      }
+
       const titleMatch = essayContent.match(/^#\s+(.+)/m);
       const title = titleMatch ? titleMatch[1].trim() : "Ship 30/30 Essay";
 
@@ -299,6 +319,7 @@ app.post("/run", async (req: Request<{}, {}, RunRequest>, res: Response) => {
         },
       });
     }
+
 
     // ── Grounded Q&A (Direct LLM Calls — No Agent Framework) ──────────────
     if (context_chunks.length === 0) {

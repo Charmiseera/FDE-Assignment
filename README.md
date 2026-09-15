@@ -17,11 +17,6 @@ The assistant answers product and growth questions with verified inline citation
 | **5** | `architecture.md` | Schema, API endpoints, boundaries, ingestion/retrieval, agent routing, topology | [`architecture.md`](./architecture.md) |
 | **6** | Agent transcripts | Dedicated log folder including failed attempts and corrections | [`agent-transcripts/`](./agent-transcripts/) |
 | **7** | Automated & Manual Tests | Automated test suites (backend, sidecar, frontend) + UI manual test plan | Section 7 below |
-<<<<<<< HEAD
-| **8** | Demo video | 2–3 minute recording with camera enabled, local Ollama, and technical trade-off | [`scripts/DEMO_SCRIPT.md`](./scripts/DEMO_SCRIPT.md) |
-
-=======
->>>>>>> 503beab974790ed07e7e47e813504bd99229ddc0
 ---
 
 ## 2. Architecture Overview

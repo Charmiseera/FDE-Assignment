@@ -166,28 +166,6 @@ npm run build
 ```
 *Result: `tsc -b && vite build` passed with zero errors.*
 
-<<<<<<< HEAD
-### Manual UI Verification Plan
-
-1. **Grounded Q&A Flow:**
-   - Ask: *"What is Elena Verna's advice on B2B product-led growth?"*
-   - Verify: Response streams back with numbered sources citing Elena Verna's episode.
-2. **Grounded Refusal Filter:**
-   - Ask: *"How do I bake a chocolate cake?"*
-   - Verify: System immediately returns a refusal stating the question is not covered in Lenny's Podcast transcripts; no hallucinations.
-3. **In-Flight Cancellation (`Stop` Button):**
-   - Click a quick-prompt button. While *"Consulting transcripts..."* appears, click the red **[■ Stop]** button.
-   - Verify: Request is aborted cleanly via `AbortController`, spinner disappears, and chat adds `*(Generation stopped by user)*`.
-4. **Ship 30/30 Essay Generation & Artifact Viewer:**
-   - Click **"Generate Ship 30/30 Essay"**.
-   - Verify: Assistant responds with essay summary and renders a **"View Generated Artifact"** button.
-   - Click **"View Generated Artifact"**: The right-hand pane slides open displaying the structured essay with title, bold text, subheadings, GFM tables, and a **Key Takeaway** section.
-5. **Local vs. Cloud Toggle:**
-   - In the header, toggle between **Local (Ollama)** and **Cloud (Groq)**.
-   - Verify: The active badge updates immediately and requests route through the selected model.
-
-=======
->>>>>>> 503beab974790ed07e7e47e813504bd99229ddc0
 ---
 
 ## 8. Troubleshooting
@@ -202,7 +180,4 @@ npm run build
 4. **Ollama Connection Refused:**
    - Start Ollama in a separate terminal: `ollama serve`.
 
-<<<<<<< HEAD
-=======
 ---
->>>>>>> 503beab974790ed07e7e47e813504bd99229ddc0

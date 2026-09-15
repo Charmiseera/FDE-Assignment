@@ -89,24 +89,7 @@ export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ artifact, onClos
         </div>
       </div>
 
-      {/* Validation Status Notice (Displayed when structural rules need review) */}
-      {validation && !validation.passed && (
-        <div className="p-4 border-b border-warning-base/30 bg-warning-light/40 shrink-0">
-          <Alert variant="warning" title="Structural Notice">
-            <p className="mb-1">
-              This draft generated structural discrepancies:
-            </p>
-            <ul className="list-disc pl-4 space-y-0.5 mb-1.5 font-mono text-[11px]">
-              {validation.unmet_criteria.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-            <p className="text-[11px] text-paper-600">
-              Content is rendered below and remains ready for direct editing or copying.
-            </p>
-          </Alert>
-        </div>
-      )}
+
 
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto p-8">

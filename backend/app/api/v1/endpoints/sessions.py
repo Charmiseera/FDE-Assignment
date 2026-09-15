@@ -433,8 +433,7 @@ async def send_message(
                     )
             except Exception as e:
                 print(f"Supabase artifact insert error: {e}")
-
-        if not _is_mock(db):
+        elif not _is_mock(db):
             try:
                 artifact_obj = Artifact(
                     id=uuid.UUID(art_id),
@@ -450,6 +449,7 @@ async def send_message(
                 print(f"Local artifact insert error: {ex}")
 
         artifact_id = art_id
+
 
     if use_supabase:
         asst_id = str(uuid.uuid4())

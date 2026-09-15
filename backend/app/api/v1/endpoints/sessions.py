@@ -410,33 +410,46 @@ async def send_message(
 
     artifact_data = sidecar_data.get("artifact")
     if artifact_data:
+        art_id = str(uuid.uuid4())
+        art_type = artifact_data.get("type", "markdown")
+        art_title = artifact_data.get("title", "Ship 30/30 Essay")
+        art_content = artifact_data.get("content", "")
+        art_meta = artifact_data.get("metadata", {})
+
         if use_supabase:
-            art_id = str(uuid.uuid4())
-            async with httpx.AsyncClient(timeout=5.0) as client:
-                await client.post(
-                    f"{SUPABASE_REST_URL}/artifacts",
-                    headers=_sb_headers(),
-                    json={
-                        "id": art_id,
-                        "session_id": str(session_id),
-                        "type": artifact_data.get("type", "markdown"),
-                        "title": artifact_data.get("title", "Ship 30/30 Essay"),
-                        "content": artifact_data.get("content", ""),
-                        "metadata_sidecar": artifact_data.get("metadata", {}),
-                    },
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    await client.post(
+                        f"{SUPABASE_REST_URL}/artifacts",
+                        headers=_sb_headers(),
+                        json={
+                            "id": art_id,
+                            "session_id": str(session_id),
+                            "type": art_type,
+                            "title": art_title,
+                            "content": art_content,
+                            "metadata": art_meta,
+                        },
+                    )
+            except Exception as e:
+                print(f"Supabase artifact insert error: {e}")
+
+        if not _is_mock(db):
+            try:
+                artifact_obj = Artifact(
+                    id=uuid.UUID(art_id),
+                    session_id=session_id,
+                    type=art_type,
+                    title=art_title,
+                    content=art_content,
+                    metadata_sidecar=art_meta
                 )
-            artifact_id = art_id
-        else:
-            artifact_obj = Artifact(
-                session_id=session_id,
-                type=artifact_data.get("type", "markdown"),
-                content=artifact_data.get("content", ""),
-                title=artifact_data.get("title", "Ship 30/30 Essay"),
-                metadata_sidecar=artifact_data.get("metadata", {})
-            )
-            db.add(artifact_obj)
-            await db.flush()
-            artifact_id = artifact_obj.id
+                db.add(artifact_obj)
+                await db.flush()
+            except Exception as ex:
+                print(f"Local artifact insert error: {ex}")
+
+        artifact_id = art_id
 
     if use_supabase:
         asst_id = str(uuid.uuid4())
@@ -495,53 +508,57 @@ async def get_artifact(
     artifact_id: uuid.UUID,
     db: AsyncSession = Depends(get_db)
 ):
+    # 1. Try Supabase REST query first
     if settings.DB_TARGET == "supabase" and not _is_mock(db):
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            res = await client.get(
-                f"{SUPABASE_REST_URL}/artifacts?id=eq.{artifact_id}&session_id=eq.{session_id}",
-                headers=_sb_headers(),
-            )
-            if res.status_code == 200 and res.json():
-                art = res.json()[0]
-                return {
-                    "success": True,
-                    "data": {
-                        "id": art["id"],
-                        "session_id": art["session_id"],
-                        "type": art["type"],
-                        "title": art["title"],
-                        "content": art["content"],
-                        "metadata": art.get("metadata_sidecar") or {},
-                        "created_at": art["created_at"],
-                    },
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                res = await client.get(
+                    f"{SUPABASE_REST_URL}/artifacts?id=eq.{artifact_id}",
+                    headers=_sb_headers(),
+                )
+                if res.status_code == 200 and res.json():
+                    art = res.json()[0]
+                    return {
+                        "success": True,
+                        "data": {
+                            "id": art["id"],
+                            "session_id": art["session_id"],
+                            "type": art["type"],
+                            "title": art["title"],
+                            "content": art["content"],
+                            "metadata": art.get("metadata_sidecar") or art.get("metadata") or {},
+                            "created_at": art["created_at"],
+                        },
+                    }
+        except Exception as e:
+            print(f"Supabase artifact fetch error: {e}")
+
+    # 2. Try local SQL DB / mock DB fallback
+    try:
+        stmt = select(Artifact).where(Artifact.id == artifact_id)
+        result = await db.execute(stmt)
+        artifact = result.scalar_one_or_none()
+
+        if artifact:
+            return {
+                "success": True,
+                "data": {
+                    "id": str(artifact.id),
+                    "session_id": str(artifact.session_id),
+                    "type": artifact.type,
+                    "title": artifact.title,
+                    "content": artifact.content,
+                    "metadata": artifact.metadata_sidecar or {},
+                    "created_at": artifact.created_at.isoformat()
                 }
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"code": "NOT_FOUND", "message": "Artifact not found"},
-            )
+            }
+    except Exception as e:
+        print(f"Local artifact fetch error: {e}")
 
-    stmt = (
-        select(Artifact)
-        .where(Artifact.id == artifact_id, Artifact.session_id == session_id)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail={"code": "NOT_FOUND", "message": "Artifact not found"}
     )
-    result = await db.execute(stmt)
-    artifact = result.scalar_one_or_none()
 
-    if not artifact:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"code": "NOT_FOUND", "message": "Artifact not found"}
-        )
 
-    return {
-        "success": True,
-        "data": {
-            "id": str(artifact.id),
-            "session_id": str(artifact.session_id),
-            "type": artifact.type,
-            "title": artifact.title,
-            "content": artifact.content,
-            "metadata": artifact.metadata_sidecar,
-            "created_at": artifact.created_at.isoformat()
-        }
-    }
+

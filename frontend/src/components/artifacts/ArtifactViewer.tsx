@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Copy, Check, FileText, Code2, X } from "lucide-react";
 import { Artifact } from "../../types";
 import { Alert } from "../ui/Alert";
@@ -119,7 +120,7 @@ export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ artifact, onClos
             />
           ) : (
             <article className="prose-editorial mx-auto">
-              <ReactMarkdown>{artifact.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{artifact.content}</ReactMarkdown>
             </article>
           )
         ) : (

@@ -141,8 +141,8 @@ export function App() {
   };
 
   const handleOpenArtifact = async (artifactId: string, sessionId?: string | null) => {
-    const sId = sessionId || activeSessionId;
-    if (!sId) return;
+    if (!artifactId) return;
+    const sId = sessionId || activeSessionId || "00000000-0000-0000-0000-000000000000";
 
     try {
       const res = await axios.get(`${API_BASE}/sessions/${sId}/artifacts/${artifactId}`);
@@ -153,6 +153,7 @@ export function App() {
       console.error("Failed to fetch artifact:", e);
     }
   };
+
 
   return (
     <div className="flex h-screen w-screen bg-paper-50 font-sans overflow-hidden">

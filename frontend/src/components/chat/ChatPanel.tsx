@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Send, Sparkles, BookOpen, FileText, ArrowRight } from "lucide-react";
 import { Message } from "../../types";
 import { Button } from "../ui/Button";
@@ -92,11 +93,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               >
                 {m.role === "assistant" ? (
                   <div className="prose font-sans text-sm text-paper-900 space-y-2 leading-relaxed">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
                   </div>
                 ) : (
                   <p className="whitespace-pre-wrap">{m.content}</p>
                 )}
+
 
                 {/* Citations */}
                 {m.citations && m.citations.length > 0 && (

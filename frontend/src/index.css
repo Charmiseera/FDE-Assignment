@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-paper-50 text-paper-900 font-sans antialiased selection:bg-signal-100 selection:text-signal-700;
+  }
+
+  /* Custom scrollbar styling for operator workbench aesthetic */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-paper-300/60 rounded-full hover:bg-paper-400/80 transition-colors;
+  }
+
+  /* Focus visible ring standards */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-signal-500 ring-offset-1 ring-offset-paper-50;
+  }
+}
+
+/* Custom typography prose overrides for essay reading */
+.prose-editorial {
+  font-family: 'Source Serif 4', Georgia, serif;
+  max-width: 65ch;
+  color: #2A2824;
+  /* paper-800 */
+}
+
+.prose-editorial h1,
+.prose-editorial h2,
+.prose-editorial h3,
+.prose-editorial h4 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #141F32;
+  /* ink-800 */
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.prose-editorial h1 {
+  font-size: 1.5rem;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}
+
+.prose-editorial h2 {
+  font-size: 1.25rem;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+.prose-editorial h3 {
+  font-size: 1.1rem;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+}
+
+.prose-editorial p {
+  line-height: 1.7;
+  margin-bottom: 1.25em;
+}
+
+.prose-editorial strong {
+  color: #171614;
+  /* paper-900 */
+  font-weight: 600;
+}

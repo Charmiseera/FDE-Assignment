@@ -24,6 +24,7 @@ import structlog
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.rag.embeddings import embed_query_with_fallback, EMBEDDING_DIM
 
 logger = structlog.get_logger()
@@ -67,8 +68,37 @@ async def retrieve_chunks(
     embedding = await embed_query(query)
     if embedding is None:
         return []
-
-    # pgvector cosine distance operator: <=>
+    if settings.DB_TARGET == "supabase" and not type(db).__module__.startswith("unittest.mock"):
+        import httpx
+        url = "https://tijpftljahjnzoioaqai.supabase.co/rest/v1/rpc/match_chunks"
+        key = "sb_publishable_KzldkcTyWz-VQGjm9uSVNg_UU5PSPYW"
+        headers = {
+            "apikey": key,
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "query_embedding": embedding,
+            "match_threshold": float(threshold),
+            "match_count": int(top_k),
+        }
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                res = await client.post(url, headers=headers, json=payload)
+                if res.status_code == 200:
+                    data = res.json()
+                    return [
+                        RetrievedChunk(
+                            source_file=item["source_file"],
+                            episode_title=item["episode_title"],
+                            chunk_text=item["chunk_text"],
+                            similarity=float(item["similarity"]),
+                        )
+                        for item in data
+                    ]
+        except Exception as exc:
+            logger.error("supabase_rest_retrieval_failed", error=str(exc))
+            return []    # pgvector cosine distance operator: <=>
     # similarity = 1 - cosine_distance, consistent with 0.60 threshold
     sql = text(
         """

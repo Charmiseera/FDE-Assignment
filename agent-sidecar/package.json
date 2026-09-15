@@ -1,0 +1,23 @@
+{
+  "name": "agent-sidecar",
+  "version": "1.0.0",
+  "description": "Pi Coding Agent HTTP Sidecar",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mariozechner/pi-coding-agent": "^0.73.1",
+    "express": "4.21.2",
+    "groq-sdk": "^0.9.1"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "@types/node": "^20.17.0",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  }
+}

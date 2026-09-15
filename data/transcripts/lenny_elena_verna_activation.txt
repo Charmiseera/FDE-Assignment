@@ -1,0 +1,15 @@
+Title: Elena Verna on B2B PLG, Activation, and Growth Loops
+Guest: Elena Verna
+Host: Lenny Rachitsky
+
+Lenny: Welcome back Elena. Today I want to dive deep into activation for B2B product-led growth. A lot of founders struggle to understand where activation starts and ends. How do you define product activation?
+
+Elena: Product activation is the milestone where a user experiences the core value proposition of your product for the first time. It is not signing up, and it is definitely not completing profile setup. For a tool like Miro, activation is creating a board and sharing it with at least one collaborator who views it. For Amplitude, it is sending your first event and generating an analysis chart.
+
+Lenny: That's a great distinction. Why do so many growth teams get this wrong?
+
+Elena: Teams make the mistake of celebrating account creation or vanity metrics. If a user signs up and leaves without experiencing core value, they are effectively churned on day zero. True activation must correlate strongly with 30-day and 90-day retention cohorts. If your activation metric does not predict long-term retention, you are measuring the wrong milestone.
+
+Lenny: How should teams approach reducing friction in this journey?
+
+Elena: Ruthlessly cut time-to-value. Delay email verification if possible, provide opinionated templates, and guide them directly into the primary workflow. Every additional step or form field in the initial session cuts conversion by 10 to 20 percent. Momentum is everything in self-serve software.

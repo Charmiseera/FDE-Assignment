@@ -58,9 +58,9 @@ def _build_ssl_context() -> ssl.SSLContext | bool | None:
     """
     Build an SSL context for asyncpg.
 
-    - SUPABASE_SSL_REQUIRED=true  -> require TLS, verify with system CAs
-    - SUPABASE_CA_CERT_PATH set   -> verify with the provided root cert
-    - SUPABASE_SSL_REQUIRED=false -> no TLS (local dev only)
+    - SUPABASE_SSL_REQUIRED=true  -> require TLS
+    - SUPABASE_CA_CERT_PATH set   -> verify with provided root cert
+    - Default                     -> TLS enabled with check_hostname=False for pooler
     """
     if not settings.SUPABASE_SSL_REQUIRED:
         return None  # local postgres with no TLS
@@ -69,6 +69,9 @@ def _build_ssl_context() -> ssl.SSLContext | bool | None:
     ca_path = settings.SUPABASE_CA_CERT_PATH
     if ca_path:
         ctx.load_verify_locations(cafile=ca_path)
+    else:
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
     return ctx
 
 

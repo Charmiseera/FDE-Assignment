@@ -1,0 +1,40 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Node & Build Outputs
+node_modules/
+dist/
+build/
+.npm
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary Ingestion, Repos & Extraction Files
+_assign.zip
+_assign_text.txt
+_docx_extracted/
+data/transcripts_temp/
+scratch/

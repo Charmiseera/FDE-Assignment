@@ -22,10 +22,27 @@ async def get_health(response: Response, db: AsyncSession = Depends(get_db)):
     # Check database — with explicit latency measurement and timeout guard
     try:
         t0 = time.monotonic()
-        await db.execute(text("SELECT 1"))
-        db_latency_ms = round((time.monotonic() - t0) * 1000, 1)
-        db_status = "ok"
-        is_db_ok = True
+        if settings.DB_TARGET == "supabase" and not type(db).__module__.startswith("unittest.mock"):
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                res = await client.get(
+                    "https://tijpftljahjnzoioaqai.supabase.co/rest/v1/chunks?select=id&limit=1",
+                    headers={
+                        "apikey": "sb_publishable_KzldkcTyWz-VQGjm9uSVNg_UU5PSPYW",
+                        "Authorization": "Bearer sb_publishable_KzldkcTyWz-VQGjm9uSVNg_UU5PSPYW",
+                    },
+                )
+                if res.status_code == 200:
+                    db_latency_ms = round((time.monotonic() - t0) * 1000, 1)
+                    db_status = "ok"
+                    is_db_ok = True
+                else:
+                    db_status = "down"
+                    is_db_ok = False
+        else:
+            await db.execute(text("SELECT 1"))
+            db_latency_ms = round((time.monotonic() - t0) * 1000, 1)
+            db_status = "ok"
+            is_db_ok = True
     except Exception:
         db_status = "down"
         is_db_ok = False

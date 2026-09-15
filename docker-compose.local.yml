@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: lenny_postgres
+    environment:
+      POSTGRES_USER: lenny
+      POSTGRES_PASSWORD: lenny
+      POSTGRES_DB: lenny_growth
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lenny -d lenny_growth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    environment:
+      - DB_TARGET=local
+      - DATABASE_URL=postgresql+asyncpg://lenny:lenny@postgres:5432/lenny_growth
+      - ALEMBIC_DATABASE_URL=postgresql://lenny:lenny@postgres:5432/lenny_growth
+    depends_on:
+      postgres:
+        condition: service_healthy
+      agent-sidecar:
+        condition: service_healthy
+
+volumes:
+  pgdata:

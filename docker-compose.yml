@@ -1,0 +1,57 @@
+services:
+  agent-sidecar:
+    build:
+      context: ./agent-sidecar
+      dockerfile: Dockerfile
+    container_name: lenny_agent_sidecar
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - PORT=4000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    expose:
+      - "4000"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:4000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lenny_backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - AGENT_SIDECAR_URL=http://agent-sidecar:4000
+    ports:
+      - "8000:8000"
+    depends_on:
+      agent-sidecar:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lenny_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy

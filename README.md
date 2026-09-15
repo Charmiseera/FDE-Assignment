@@ -17,8 +17,6 @@ The assistant answers product and growth questions with verified inline citation
 | **5** | `architecture.md` | Schema, API endpoints, boundaries, ingestion/retrieval, agent routing, topology | [`architecture.md`](./architecture.md) |
 | **6** | Agent transcripts | Dedicated log folder including failed attempts and corrections | [`agent-transcripts/`](./agent-transcripts/) |
 | **7** | Automated & Manual Tests | Automated test suites (backend, sidecar, frontend) + UI manual test plan | Section 7 below |
-| **8** | Demo Video Script | 2–3 minute video outline with camera enabled, product walkthrough, local Ollama, technical trade-off | Section 9 below |
-
 ---
 
 ## 2. Architecture Overview
@@ -170,28 +168,7 @@ npm run build
 
 ---
 
-## 8. Manual UI Test Plan
-
-1. **Grounded Q&A Flow:**
-   - Ask: *"What is Elena Verna's advice on B2B product-led growth?"*
-   - Verify: Response streams back with numbered sources citing Elena Verna's episode.
-2. **Grounded Refusal Filter:**
-   - Ask: *"How do I bake a chocolate cake?"*
-   - Verify: System immediately returns a refusal stating the question is not covered in Lenny's Podcast transcripts; no hallucinations.
-3. **In-Flight Cancellation (`Stop` Button):**
-   - Click a quick-prompt button. While *"Consulting transcripts..."* appears, click the red **[■ Stop]** button.
-   - Verify: Request is aborted cleanly via `AbortController`, spinner disappears, and chat adds `*(Generation stopped by user)*`.
-4. **Ship 30/30 Essay Generation & Artifact Viewer:**
-   - Click **"Generate Ship 30/30 Essay"**.
-   - Verify: Assistant responds with essay summary and renders a **"View Generated Artifact"** button.
-   - Click **"View Generated Artifact"**: The right-hand pane slides open displaying the structured essay with title, bold text, subheadings, GFM tables, and a **Key Takeaway** section.
-5. **Local vs. Cloud Toggle:**
-   - In the header, toggle between **Local (Ollama)** and **Cloud (Groq)**.
-   - Verify: The active badge updates immediately and requests route through the selected model.
-
----
-
-## 9. Troubleshooting
+## 8. Troubleshooting
 
 1. **Artifact displays empty or 404:**
    - Verify that `agent-sidecar` is running on port 4000 (`http://localhost:4000/health`).
@@ -204,7 +181,3 @@ npm run build
    - Start Ollama in a separate terminal: `ollama serve`.
 
 ---
-
-## 10. Demo Video Script (2–3 Minutes)
-
-See [`scripts/DEMO_SCRIPT.md`](./scripts/DEMO_SCRIPT.md) for the complete word-for-word recording transcript with camera and screen instructions.

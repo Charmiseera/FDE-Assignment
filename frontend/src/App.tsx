@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Session, Message, Artifact, AppConfig } from "./types";
 import { SessionSidebar } from "./components/sidebar/SessionSidebar";
@@ -17,6 +17,7 @@ export function App() {
   const [isLoading, setIsLoading] = useState(false);
   // Provider selected by the user — starts as backend default, can be toggled per session
   const [activeProvider, setActiveProvider] = useState<"ollama" | "groq">("ollama");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     fetchConfig();
@@ -107,11 +108,20 @@ export function App() {
     setMessages((prev) => [...prev, tempUserMsg]);
     setIsLoading(true);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
-      const res = await axios.post(`${API_BASE}/sessions/${currentSessionId}/messages`, {
-        content,
-        provider: activeProvider, // send selected provider override with every request
-      });
+      const res = await axios.post(
+        `${API_BASE}/sessions/${currentSessionId}/messages`,
+        {
+          content,
+          provider: activeProvider, // send selected provider override with every request
+        },
+        {
+          signal: controller.signal,
+        }
+      );
 
       if (res.data.success) {
         const assistantData = res.data.data;
@@ -133,11 +143,33 @@ export function App() {
 
         fetchSessions();
       }
-    } catch (e) {
-      console.error("Failed to send message:", e);
+    } catch (e: any) {
+      if (axios.isCancel(e) || e.name === "CanceledError" || e.code === "ERR_CANCELED") {
+        console.log("Message generation cancelled by user");
+        const stoppedMsg: Message = {
+          id: "stopped-" + Date.now(),
+          role: "assistant",
+          content: "*(Generation stopped by user)*",
+          citations: [],
+          artifact_id: null,
+          created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, stoppedMsg]);
+      } else {
+        console.error("Failed to send message:", e);
+      }
     } finally {
+      abortControllerRef.current = null;
       setIsLoading(false);
     }
+  };
+
+  const handleStopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
   };
 
   const handleOpenArtifact = async (artifactId: string, sessionId?: string | null) => {
@@ -178,6 +210,7 @@ export function App() {
               messages={messages}
               onSendMessage={handleSendMessage}
               onOpenArtifact={handleOpenArtifact}
+              onStopGeneration={handleStopGeneration}
               isLoading={isLoading}
             />
           </div>

@@ -179,3 +179,121 @@
 .prose-dark tr:hover {
   background: rgba(255, 255, 255, 0.06);
 }
+
+/* Editorial / Paper Theme Prose for Artifact Viewer */
+.prose-editorial {
+  color: #171614;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.prose-editorial h1 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #0d141f;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid #e4e1da;
+  padding-bottom: 0.5rem;
+}
+
+.prose-editorial h2 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #1c2e48;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}
+
+.prose-editorial h3 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #263f60;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+.prose-editorial p {
+  margin-bottom: 1.1em;
+  color: #2a2824;
+}
+
+.prose-editorial strong {
+  color: #0d141f;
+  font-weight: 600;
+}
+
+.prose-editorial ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.1em;
+  color: #2a2824;
+}
+
+.prose-editorial ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.1em;
+  color: #2a2824;
+}
+
+.prose-editorial li {
+  margin-bottom: 0.4em;
+}
+
+.prose-editorial blockquote {
+  border-left: 4px solid #1e7f73;
+  padding-left: 1.25rem;
+  margin: 1.25em 0;
+  color: #5c584e;
+  font-style: italic;
+  background: #f2f0ec;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.prose-editorial table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.9rem;
+  border: 1px solid #cfcbc1;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.prose-editorial th {
+  background: #f2f0ec;
+  color: #0d141f;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 1px solid #cfcbc1;
+}
+
+.prose-editorial td {
+  padding: 0.65rem 1rem;
+  border: 1px solid #e4e1da;
+  color: #2a2824;
+}
+
+.prose-editorial tr:nth-child(even) {
+  background: #faf9f7;
+}
+
+.prose-editorial code {
+  background: #f2f0ec;
+  border: 1px solid #e4e1da;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85em;
+  color: #114d46;
+}

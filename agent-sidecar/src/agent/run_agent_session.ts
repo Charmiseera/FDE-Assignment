@@ -28,7 +28,7 @@ export interface AgentRunResult {
 
 export async function runAgentSession(options: AgentRunOptions): Promise<AgentRunResult> {
   const provider = options.provider || "groq";
-  const modelId = options.model || "llama-3.3-70b-versatile";
+  const modelId = options.model || "openai/gpt-oss-120b";
 
   const authStorage = AuthStorage.inMemory();
   const apiKey = process.env.GROQ_API_KEY;
@@ -79,7 +79,24 @@ export async function runAgentSession(options: AgentRunOptions): Promise<AgentRu
       console.log(`[Pi:session] Starting prompt for model ${provider}/${modelId}`);
       await session.prompt(options.prompt);
 
-      const content = session.getLastAssistantText() || "";
+      // Extract text content from the last assistant message in session
+      let content = "";
+      const msgs = (session as any).agent?.state?.messages || (session as any).messages || [];
+      for (let i = msgs.length - 1; i >= 0; i--) {
+        const msg = msgs[i];
+        if (msg.role === "assistant") {
+          if (typeof msg.content === "string") {
+            content = msg.content;
+          } else if (Array.isArray(msg.content)) {
+            content = msg.content
+              .filter((c: any) => c.type === "text")
+              .map((c: any) => c.text)
+              .join("");
+          }
+          if (content.trim()) break;
+        }
+      }
+
       return {
         content,
         toolCalls,

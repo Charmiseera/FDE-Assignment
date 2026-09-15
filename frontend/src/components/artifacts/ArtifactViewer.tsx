@@ -93,7 +93,12 @@ export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ artifact, onClos
 
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto p-8">
-        {viewMode === "rendered" ? (
+        {!artifact.content || !artifact.content.trim() ? (
+          <div className="flex flex-col items-center justify-center h-48 text-center text-paper-500 py-12">
+            <FileText className="w-8 h-8 text-paper-400 mb-2" />
+            <p className="font-sans text-sm font-medium">Artifact content is empty</p>
+          </div>
+        ) : viewMode === "rendered" ? (
           artifact.type === "html" ? (
             <iframe
               title={artifact.title || "HTML Artifact"}
@@ -102,7 +107,7 @@ export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ artifact, onClos
               className="w-full h-full min-h-[600px] border border-paper-200 rounded-base bg-white shadow-2xs"
             />
           ) : (
-            <article className="prose-editorial mx-auto">
+            <article className="prose-editorial mx-auto max-w-3xl">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{artifact.content}</ReactMarkdown>
             </article>
           )

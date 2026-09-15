@@ -182,7 +182,7 @@ Returns `503` if the database is down. Provider/sidecar unreachability is report
 
 ### `GET /api/v1/config`
 ```json
-{ "success": true, "data": { "llm_provider": "groq", "model": "llama-3.3-70b-versatile", "embedding_model": "nomic-embed-text" } }
+{ "success": true, "data": { "llm_provider": "groq", "model": "openai/gpt-oss-120b", "embedding_model": "nomic-embed-text" } }
 ```
 
 ### Ingestion — not an HTTP endpoint

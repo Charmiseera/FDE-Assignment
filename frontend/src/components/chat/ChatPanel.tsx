@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Send, Sparkles, BookOpen, FileText, ArrowRight } from "lucide-react";
+import { Send, Sparkles, BookOpen, FileText, ArrowRight, Square } from "lucide-react";
 import { Message } from "../../types";
 import { Button } from "../ui/Button";
 import { Textarea } from "../ui/Textarea";
@@ -11,6 +11,7 @@ interface ChatPanelProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   onOpenArtifact: (artifactId: string) => void;
+  onStopGeneration?: () => void;
   isLoading: boolean;
 }
 
@@ -18,6 +19,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   messages,
   onSendMessage,
   onOpenArtifact,
+  onStopGeneration,
   isLoading,
 }) => {
   const [input, setInput] = useState("");
@@ -135,8 +137,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         )}
 
         {isLoading && (
-          <div className="flex items-center gap-2 p-2">
+          <div className="flex items-center justify-between p-3 bg-paper-100/90 border border-paper-200 rounded-lg shadow-2xs">
             <LoadingDots label="Consulting transcripts and generating response..." />
+            {onStopGeneration && (
+              <button
+                type="button"
+                onClick={onStopGeneration}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-base bg-red-50 text-red-700 hover:bg-red-600 hover:text-white border border-red-200 font-sans text-xs font-semibold transition-all shadow-2xs cursor-pointer ml-3 shrink-0"
+              >
+                <Square className="w-3 h-3 fill-current" />
+                <span>Stop</span>
+              </button>
+            )}
           </div>
         )}
         <div ref={endRef} />
@@ -169,14 +181,27 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             rows={2}
             className="flex-1 text-sm font-sans"
           />
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={!input.trim() || isLoading}
-            className="h-10 px-4 gap-1.5 shrink-0"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+          {isLoading ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onStopGeneration}
+              title="Stop Generation"
+              className="h-10 px-4 gap-1.5 shrink-0 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
+            >
+              <Square className="w-3.5 h-3.5 fill-current" />
+              <span className="text-xs font-semibold">Stop</span>
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!input.trim()}
+              className="h-10 px-4 gap-1.5 shrink-0"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          )}
         </form>
       </div>
     </div>

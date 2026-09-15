@@ -173,14 +173,33 @@ IMPORTANT AGENT INSTRUCTION: You MUST use the render_check tool to validate your
 
 async function callGroq(prompt: string, model: string): Promise<string> {
   const client = new Groq({ apiKey: GROQ_API_KEY });
-  const completion = await client.chat.completions.create({
-    model,
-    messages: [{ role: "user", content: prompt }],
-    max_tokens: 2048,
-    temperature: 0.4,
-  });
-  return completion.choices[0]?.message?.content || "";
+  let targetModel = model;
+  if (!targetModel || targetModel.includes("openai") || targetModel.includes("gpt")) {
+    targetModel = "llama-3.3-70b-versatile";
+  }
+  try {
+    const completion = await client.chat.completions.create({
+      model: targetModel,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 2048,
+      temperature: 0.4,
+    });
+    return completion.choices[0]?.message?.content || "";
+  } catch (err) {
+    console.warn(`[Sidecar] Groq call failed for model ${targetModel}, retrying with llama-3.3-70b-versatile:`, err);
+    if (targetModel !== "llama-3.3-70b-versatile") {
+      const completion = await client.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2048,
+        temperature: 0.4,
+      });
+      return completion.choices[0]?.message?.content || "";
+    }
+    throw err;
+  }
 }
+
 
 async function callOllama(prompt: string, model: string): Promise<string> {
   console.log(`[Sidecar] Calling Ollama model: ${model}, prompt length: ${prompt.length}`);
